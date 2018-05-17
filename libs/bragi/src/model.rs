@@ -32,7 +32,7 @@ use geo;
 use geojson;
 use heck::SnakeCase;
 use mimir;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Geocoding {
@@ -75,7 +75,7 @@ pub struct GeocodingResponse {
     // pub state: Option<String>,
     // pub country: Option<String>,
     // pub geohash: Option<String>,
-    pub administrative_regions: Vec<Rc<mimir::Admin>>,
+    pub administrative_regions: Vec<Arc<mimir::Admin>>,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub poi_types: Vec<mimir::PoiType>,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
@@ -170,7 +170,7 @@ fn get_admin_type(adm: &mimir::Admin) -> String {
     }
 }
 
-fn get_city_name(admins: &Vec<Rc<mimir::Admin>>) -> Option<String> {
+fn get_city_name(admins: &Vec<Arc<mimir::Admin>>) -> Option<String> {
     // for the moment for the 'postcode' and the 'city', we take first admin
     // that has a postcode
     // TODO: change this (with a 'city tag in the admin ?')
@@ -181,7 +181,7 @@ fn get_city_name(admins: &Vec<Rc<mimir::Admin>>) -> Option<String> {
         .map(|admin| admin.name.clone())
 }
 
-fn get_citycode(admins: &Vec<Rc<mimir::Admin>>) -> Option<String> {
+fn get_citycode(admins: &Vec<Arc<mimir::Admin>>) -> Option<String> {
     admins
         .iter()
         .find(|a| !a.zip_codes.is_empty())

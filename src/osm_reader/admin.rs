@@ -37,7 +37,7 @@ use super::OsmPbfReader;
 use admin_geofinder::AdminGeoFinder;
 use itertools::Itertools;
 use osm_reader::osm_utils::make_centroid;
-use std::cell::Cell;
+use std::sync::{Arc, RwLock};
 use std::collections::BTreeSet;
 pub type StreetsVec = Vec<mimir::Street>;
 use cosmogony::ZoneType;
@@ -153,7 +153,7 @@ pub fn read_administrative_regions(
                 name: name.to_string(),
                 label: format!("{}{}", name.to_string(), format_zip_codes(&zip_codes)),
                 zip_codes: zip_codes,
-                weight: Cell::new(0.),
+                weight: Arc::new(RwLock::new(0.)),
                 coord: coord_center.unwrap_or_else(|| make_centroid(&boundary)),
                 boundary: boundary,
                 admin_type: admin_type,
@@ -177,13 +177,15 @@ pub fn compute_admin_weight(streets: &StreetsVec, admins_geofinder: &AdminGeoFin
     let mut max = 1.;
     for st in streets {
         for admin in &st.administrative_regions {
-            admin.weight.set(admin.weight.get() + 1.);
-            max = f64::max(max, admin.weight.get());
+            let mut w = admin.weight.write().unwrap();
+            *w += 1.;
+            max = f64::max(max, *w);
         }
     }
 
     for admin in admins_geofinder.admins_without_boundary() {
-        admin.weight.set(admin.weight.get() / max);
+        let mut w = admin.weight.write().unwrap();
+        *w = *w / max;
     }
 }
 
