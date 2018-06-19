@@ -1,18 +1,15 @@
 image: docker
 
-variables:
-  DOCKER_DRIVER: overlay2
-
 services:
   - docker:dind
 
 variables:
-  OSM_DIR: /data/osm
-  ADDR_DIR: /data/addresses
-  COSMOGONY_DIR: /data/cosmogony
+  DOCKER_DRIVER: overlay2
+  SHARED_PATH: /builds/$CI_PROJECT_PATH/shared
 
 test:
   before_script:
+   - export OSM_DIR=$SHARED_PATH/data/osm ADDR_DIR=$SHARED_PATH/data/addresses COSMOGONY_DIR=$SHARED_PATH/data/cosmogony
    - apk add --no-cache python3 py3-pip git bash
    - pip3 install docker-compose pipenv
    - git clone -b dockerfile https://github.com/antoine-de/geocoder-tester.git
@@ -25,11 +22,9 @@ test:
    - mv tester_settings.yml docker_mimir/
    - cd docker_mimir
    - pipenv install --system --deploy
-   - mkdir -p /data/osm
-   - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P /data/osm
+   - mkdir -p $OSM_DIR
+   - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P $OSM_DIR
   script:
-   - ls -l /data
-   - ls -l /data/osm
    - docker-compose run mimir ls -l /data/osm
    - inv -f tester_settings.yml load-in-docker-and-test
   artifacts:
