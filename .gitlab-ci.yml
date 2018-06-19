@@ -1,0 +1,7 @@
+image: rust:latest
+
+build:
+  stage: build
+  script:
+   - cargo build
+
