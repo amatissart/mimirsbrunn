@@ -28,7 +28,7 @@ test:
    - mkdir -p /data/osm
    - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P /data/osm
   script:
-   - inv -f tester_settings.yaml load-in-docker-and-test
+   - inv -f tester_settings.yml load-in-docker-and-test
   artifacts:
     expire_in: 2 weeks
     paths:
