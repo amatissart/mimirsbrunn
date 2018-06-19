@@ -28,6 +28,9 @@ test:
    - mkdir -p /data/osm
    - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P /data/osm
   script:
+   - ls -l /data
+   - ls -l /data/osm
+   - docker-compose run mimir ls -l /data/osm
    - inv -f tester_settings.yml load-in-docker-and-test
   artifacts:
     expire_in: 2 weeks
