@@ -8,7 +8,7 @@ services:
 
 test:
   before_script:
-   - apk add --no-cache python3 py3-pip
+   - apk add --no-cache python3 py3-pip git
    - pip3 install docker-compose pipenv
    - git clone -b docker-compose https://github.com/QwantResearch/docker_mimir.git
    - cd docker_mimir
