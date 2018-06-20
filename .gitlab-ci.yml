@@ -30,4 +30,4 @@ test:
   artifacts:
     expire_in: 2 weeks
     paths:
-      - results
+      - docker_mimir/results
