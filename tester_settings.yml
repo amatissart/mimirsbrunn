@@ -3,7 +3,13 @@ osm_file: /data/osm/luxembourg-latest.osm.pbf
 es: http://es:9200
 
 admin:
-  osm:
-    levels:
-      - 8
+  cosmogony:
+    output_dir: /data/cosmogony
 
+poi:
+  osm:
+
+
+# TODO: import addresses
+# addresses:
+#   oa_file: /data/addresses/luxembourg.csv

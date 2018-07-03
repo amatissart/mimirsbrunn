@@ -9,24 +9,18 @@ variables:
 
 test:
   before_script:
-   - export OSM_DIR=$SHARED_PATH/data/osm ADDR_DIR=$SHARED_PATH/data/addresses COSMOGONY_DIR=$SHARED_PATH/data/cosmogony
+   - export OSM_DIR=$SHARED_PATH/data/osm
    - apk add --no-cache python3 py3-pip git bash
    - pip3 install docker-compose pipenv
-   - git clone -b dockerfile https://github.com/antoine-de/geocoder-tester.git
-   - cd geocoder-tester
-   - docker build -t geocoder-tester .
-   - cd ..
-   - docker build -t mimirsbrunn -f docker/Dockerfile_import .
-   - docker build -t bragi -f docker/Dockerfile_bragi .
-   - git clone -b docker-compose https://github.com/QwantResearch/docker_mimir.git
+   - git clone -b master https://github.com/QwantResearch/docker_mimir.git
+   - mv docker-compose.build.yml docker_mimir/
    - mv tester_settings.yml docker_mimir/
    - cd docker_mimir
    - pipenv install --system --deploy
    - mkdir -p $OSM_DIR
    - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P $OSM_DIR
   script:
-   - docker-compose run mimir ls -l /data/osm
-   - inv -f tester_settings.yml load-in-docker-and-test
+   - inv -f tester_settings.yml load-in-docker-and-test --files docker-compose.build.yml
   artifacts:
     expire_in: 2 weeks
     paths:
