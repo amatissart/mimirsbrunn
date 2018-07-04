@@ -7,20 +7,18 @@ variables:
   DOCKER_DRIVER: overlay2
   SHARED_PATH: /builds/$CI_PROJECT_PATH/shared
 
-test:
+geocoder-tester:
   before_script:
-   - export OSM_DIR=$SHARED_PATH/data/osm
+   - export OSM_DIR=$SHARED_PATH/data/osm ADDR_DIR=$SHARED_PATH/data/addresses
    - apk add --no-cache python3 py3-pip git bash
    - pip3 install docker-compose pipenv
    - git clone -b esTimeout https://github.com/QwantResearch/docker_mimir.git
-   - mv docker-compose.build.yml docker_mimir/
-   - mv tester_settings.yml docker_mimir/
+   - mv ci/gitlab/*.yml docker_mimir/
    - cd docker_mimir
    - pipenv install --system --deploy
-   - mkdir -p $OSM_DIR
-   - wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P $OSM_DIR
+   - ../ci/gitlab/download_data.sh
   script:
-   - inv -f tester_settings.yml load-in-docker-and-test --files docker-compose.build.yml
+   - inv -f import_settings_with_cosmogony.yml load-in-docker-and-test --files docker-compose.build.yml
   artifacts:
     expire_in: 2 weeks
     paths:

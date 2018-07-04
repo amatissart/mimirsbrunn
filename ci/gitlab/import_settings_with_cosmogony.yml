@@ -1,6 +1,7 @@
 # example file to run mimir in docker, the file path must be changed
-osm_file: /data/osm/luxembourg-latest.osm.pbf
 es: http://es:9200
+
+osm_file: /data/osm/france-latest.osm.pbf
 
 admin:
   cosmogony:
@@ -9,7 +10,5 @@ admin:
 poi:
   osm:
 
-
-# TODO: import addresses
-# addresses:
-#   oa_file: /data/addresses/luxembourg.csv
+addresses:
+  bano_file: /data/addresses/full.csv
