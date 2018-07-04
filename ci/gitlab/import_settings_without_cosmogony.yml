@@ -3,8 +3,9 @@ es: http://es:9200
 osm_file: /data/osm/france-latest.osm.pbf
 
 admin:
-  cosmogony:
-    output_dir: /data/cosmogony
+  osm:
+    levels:
+      - 8
 
 poi:
   osm:
