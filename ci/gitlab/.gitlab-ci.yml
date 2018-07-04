@@ -20,9 +20,8 @@ geocoder-tester-cosmogony:
     expire_in: 2 weeks
     paths:
       - docker_mimir/results
-  # tags:
-  #   - functionnal_tests
-  #   - france_cosmogony
+  tags:
+    - france_cosmogony
 
 geocoder-tester-osm-admins:
   before_script:
@@ -37,8 +36,7 @@ geocoder-tester-osm-admins:
     expire_in: 2 weeks
     paths:
       - docker_mimir/results
-  # tags:
-  #   - functionnal_tests
-  #   - france_osm_admins
+  tags:
+    - france_osm_admins
 
 
