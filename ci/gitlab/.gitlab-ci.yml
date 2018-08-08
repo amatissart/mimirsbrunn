@@ -5,7 +5,7 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay2
-  SHARED_PATH: /data/mimir
+  SHARED_PATH: /builds/$CI_PROJECT_PATH/shared
 
 geocoder-tester-cosmogony:
   before_script:
