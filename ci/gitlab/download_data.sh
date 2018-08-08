@@ -9,4 +9,4 @@ set -x
 
 # Download osm dataset
 mkdir -p $OSM_DIR
-wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -P $OSM_DIR
+wget https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -O $OSM_DIR/luxembourg-latest.osm.pbf
