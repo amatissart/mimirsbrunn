@@ -8,7 +8,7 @@ variables:
   SHARED_PATH: /builds/$CI_PROJECT_PATH/shared
 
 cache:
-  key: ${CI_PROJECT_PATH}_data
+  key: docker_mimir_data
   paths:
     - shared/
 
