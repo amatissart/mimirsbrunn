@@ -15,7 +15,7 @@ cache:
 geocoder-tester-cosmogony:
   before_script:
     - export OSM_DIR=$SHARED_PATH/osm ADDR_DIR=$SHARED_PATH/addresses
-    - ls -Rlh $SHARED_PATH
+    - ls -Rlh $SHARED_PATH || true
     - apk add --no-cache python3 py3-pip git bash
     - ./ci/gitlab/init.sh
     - ./ci/gitlab/download_data.sh
