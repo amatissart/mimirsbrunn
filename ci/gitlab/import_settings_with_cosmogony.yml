@@ -1,13 +1,9 @@
+osm_file: /data/osm/luxembourg-latest.osm.pbf
 es: http://es:9200
-
-osm_file: /data/osm/france-latest.osm.pbf
 
 admin:
   cosmogony:
     output_dir: /data/cosmogony
 
-poi:
-  osm:
+geocoder_tester_region: luxembourg
 
-addresses:
-  bano_file: /data/addresses/full.csv
