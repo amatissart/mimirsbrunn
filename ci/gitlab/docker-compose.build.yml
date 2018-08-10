@@ -9,3 +9,5 @@ services:
     build:
       context: $CI_PROJECT_DIR
       dockerfile: docker/Dockerfile_import
+    environment:
+      - RUST_LOG=warn
