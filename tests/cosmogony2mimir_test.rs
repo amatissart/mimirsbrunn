@@ -48,7 +48,7 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
     // we should be able to find the imported admins
 
     // All results should be admins, and have some basic information
-    let all_objects: Vec<_> = es_wrapper.search_and_filter("*.*", |_| true).collect();
+    let all_objects: Vec<_> = es_wrapper.search_and_filter("label:*", |_| true).collect();
     assert_eq!(all_objects.len(), 7);
 
     assert!(all_objects.iter().any(|r| r.is_admin()));
@@ -87,7 +87,7 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
 
     // check the state_district Fausse Seine-et-Marne
     let res: Vec<_> = es_wrapper
-        .search_and_filter("label:Fausse Seine-et-Marne", |_| true)
+        .search_and_filter("name:Seine-et-Marne", |_| true)
         .collect();
     assert!(res.len() >= 1);
 
@@ -108,7 +108,7 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
 
     // we can even get the whole france
     let res: Vec<_> = es_wrapper
-        .search_and_filter("label:France hexagonale", |_| true)
+        .search_and_filter("name:France", |_| true)
         .collect();
     assert!(res.len() >= 1);
 
@@ -145,7 +145,7 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
     // we check the weight is max on the admin with the highest population number
     let res: Vec<_> = es_wrapper
         .search_and_filter(
-            "label:Melun (77000-CP77001), Fausse Seine-et-Marne, France hexagonale",
+            "label:Melun",
             |_| true,
         )
         .collect();

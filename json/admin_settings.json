@@ -48,28 +48,116 @@
     },
     "mappings": {
         "admin": {
-            "dynamic": "false",
-            "properties": {
-                "id": { "type": "string", "index": "not_analyzed" },
-                "level": { "type": "long", "index": "no" },
-                "name": {
-                    "type": "string",
-                    "index_options": "docs",
-                    "analyzer": "word",
-                    "fields": {
-                        "prefix": {
+            "_all": {
+                "enabled": false
+            },
+            "dynamic_templates": [
+                {
+                    "i18n_names": {
+                        "match_pattern": "regex",
+                        "path_match": "^(name($|s\.\w+)",
+                        "mapping": {
                             "type": "string",
                             "index_options": "docs",
-                            "analyzer": "prefix",
-                            "search_analyzer": "word"
+                            "analyzer": "word",
+                            "fields": {
+                                "prefix": {
+                                    "type": "string",
+                                    "index_options": "docs",
+                                    "analyzer": "prefix",
+                                    "search_analyzer": "word"
+                                }
+                            }
                         }
                     }
                 },
+                {
+                    "i18n_labels": {
+                        "match_pattern": "regex",
+                        "path_match": "^label($|s\.\w+)",
+                        "mapping": {
+                            "type": "string",
+                            "index_options": "docs",
+                            "analyzer": "word",
+                            "copy_to": "full_{name}",
+                            "fields": {
+                                "prefix": {
+                                    "type": "string",
+                                    "index_options": "docs",
+                                    "analyzer": "prefix",
+                                    "search_analyzer": "word",
+                                    "norms": {
+                                        "enabled": false
+                                    }
+                                },
+                                "ngram": {
+                                    "type": "string",
+                                    "index_options": "docs",
+                                    "analyzer": "ngram_with_synonyms",
+                                    "search_analyzer": "ngram",
+                                    "norms": {
+                                        "enabled": false
+                                    }
+                                }
+                            },
+                            "norms": {
+                                "enabled": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "i18n_full_labels": {
+                        "match_pattern": "regex",
+                        "path_match": "^full_label($|s\.\w+)",
+                        "mapping": {
+                            "type": "string",
+                            "index_options": "docs",
+                            "analyzer": "word",
+                            "fields": {
+                                "prefix": {
+                                    "type": "string",
+                                    "index_options": "docs",
+                                    "analyzer": "prefix",
+                                    "search_analyzer": "word",
+                                    "norms": {
+                                        "enabled": false
+                                    }
+                                },
+                                "ngram": {
+                                    "type": "string",
+                                    "index_options": "docs",
+                                    "analyzer": "ngram_with_synonyms",
+                                    "search_analyzer": "ngram",
+                                    "norms": {
+                                        "enabled": false
+                                    }
+                                }
+                            },
+                            "norms": {
+                                "enabled": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "disable_dynamic_fields": {
+                        "match": "*",
+                        "mapping": {
+                            "type": "object",
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "properties": {
+                "id": { "type": "string", "index": "not_analyzed" },
+                "level": { "type": "long", "index": "no" },
                 "zip_codes": {
                     "type": "string",
                     "index_options": "docs",
                     "analyzer": "word",
-                    "copy_to": "full_label",
+                    "copy_to": ["full_label"],
                     "fields": {
                         "prefix": {
                             "type": "string",
@@ -84,63 +172,6 @@
                     "lat_lon": true,
                     "geohash_prefix": true,
                     "geohash_precision": "1m"
-                },
-                "label": {
-                    "type": "string",
-                    "index_options": "docs",
-                    "analyzer": "word",
-                    "copy_to": "full_label",
-                    "fields": {
-                        "prefix": {
-                            "type": "string",
-                            "index_options": "docs",
-                            "analyzer": "prefix",
-                            "search_analyzer": "word",
-                            "norms": {
-                                "enabled": false
-                            }
-                        },
-                        "ngram": {
-                            "type": "string",
-                            "index_options": "docs",
-                            "analyzer": "ngram_with_synonyms",
-                            "search_analyzer": "ngram",
-                            "norms": {
-                                "enabled": false
-                            }
-                        }
-                    },
-                    "norms": {
-                        "enabled": false
-                    }
-                },
-                "full_label": {
-                    "type": "string",
-                    "index_options": "docs",
-                    "analyzer": "word",
-                    "fields": {
-                        "prefix": {
-                            "type": "string",
-                            "index_options": "docs",
-                            "analyzer": "prefix",
-                            "search_analyzer": "word",
-                            "norms": {
-                                "enabled": false
-                            }
-                        },
-                        "ngram": {
-                            "type": "string",
-                            "index_options": "docs",
-                            "analyzer": "ngram_with_synonyms",
-                            "search_analyzer": "ngram",
-                            "norms": {
-                                "enabled": false
-                            }
-                        }
-                    },
-                    "norms": {
-                        "enabled": false
-                    }
                 },
                 "weight": { "type": "double" },
                 "zone_type": { "type": "string", "index": "not_analyzed"}
