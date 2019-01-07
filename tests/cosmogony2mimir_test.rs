@@ -138,16 +138,18 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
             assert_eq!(fr.weight, 0f64);
             assert!(fr.coord.is_valid());
             assert_eq!(fr.zone_type, Some(ZoneType::Country));
+            assert!(fr
+                .names
+                .0
+                .iter()
+                .any(|p| p.key == "ru" && p.value == "Метрополия Франции"));
         }
         _ => panic!("should be an admin"),
     }
 
     // we check the weight is max on the admin with the highest population number
     let res: Vec<_> = es_wrapper
-        .search_and_filter(
-            "label:Melun",
-            |_| true,
-        )
+        .search_and_filter("label:Melun", |_| true)
         .collect();
     assert!(res.len() >= 1);
 

@@ -55,7 +55,7 @@
                 {
                     "i18n_names": {
                         "match_pattern": "regex",
-                        "path_match": "^(name($|s\.\w+)",
+                        "path_match": "^name($|s\\.\\w+)",
                         "mapping": {
                             "type": "string",
                             "index_options": "docs",
@@ -74,12 +74,12 @@
                 {
                     "i18n_labels": {
                         "match_pattern": "regex",
-                        "path_match": "^label($|s\.\w+)",
+                        "path_match": "^labels\\.\\w+",
                         "mapping": {
                             "type": "string",
                             "index_options": "docs",
                             "analyzer": "word",
-                            "copy_to": "full_{name}",
+                            "copy_to": "full_labels.{name}",
                             "fields": {
                                 "prefix": {
                                     "type": "string",
@@ -109,7 +109,7 @@
                 {
                     "i18n_full_labels": {
                         "match_pattern": "regex",
-                        "path_match": "^full_label($|s\.\w+)",
+                        "path_match": "^full_label($|s\\.\\w+)",
                         "mapping": {
                             "type": "string",
                             "index_options": "docs",
@@ -141,8 +141,9 @@
                     }
                 },
                 {
-                    "disable_dynamic_fields": {
-                        "match": "*",
+                    "disable_other_dynamic_fields": {
+                        "match_pattern": "regex",
+                        "path_match": "^(?!name|label|full_label).*",
                         "mapping": {
                             "type": "object",
                             "enabled": false
@@ -172,6 +173,35 @@
                     "lat_lon": true,
                     "geohash_prefix": true,
                     "geohash_precision": "1m"
+                },
+                "label": {
+                    "type": "string",
+                    "index_options": "docs",
+                    "analyzer": "word",
+                    "copy_to": "full_label",
+                    "fields": {
+                        "prefix": {
+                            "type": "string",
+                            "index_options": "docs",
+                            "analyzer": "prefix",
+                            "search_analyzer": "word",
+                            "norms": {
+                                "enabled": false
+                            }
+                        },
+                        "ngram": {
+                            "type": "string",
+                            "index_options": "docs",
+                            "analyzer": "ngram_with_synonyms",
+                            "search_analyzer": "ngram",
+                            "norms": {
+                                "enabled": false
+                            }
+                        }
+                    },
+                    "norms": {
+                        "enabled": false
+                    }
                 },
                 "weight": { "type": "double" },
                 "zone_type": { "type": "string", "index": "not_analyzed"}

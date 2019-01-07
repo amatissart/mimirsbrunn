@@ -91,6 +91,8 @@ impl IntoAdmin for Zone {
             zone_type: self.zone_type,
             parent_id: parent_osm_id,
             codes: osm_utils::get_osm_codes_from_tags(&self.tags),
+            names: osm_utils::get_names_from_tags(&self.tags),
+            labels: self.international_labels.into_iter().collect()
         }
     }
 }

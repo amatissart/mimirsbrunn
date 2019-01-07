@@ -80,3 +80,15 @@ pub fn get_osm_codes_from_tags(tags: &osmpbfreader::Tags) -> Vec<mimir::Code> {
         })
         .collect()
 }
+
+pub fn get_names_from_tags(tags: &osmpbfreader::Tags) -> mimir::I18nProperties {
+    let properties = tags
+        .iter()
+        .filter(|(k, _)| k.starts_with("name:"))
+        .map(|property| mimir::Property {
+            key: property.0[5..].to_string(),
+            value: property.1.to_string(),
+        })
+        .collect();
+    mimir::I18nProperties(properties)
+}

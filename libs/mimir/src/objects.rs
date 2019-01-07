@@ -34,9 +34,11 @@ use serde;
 use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{SerializeStruct, Serializer};
 use std::cmp::Ordering;
+use std::collections::BTreeMap;
 use std::fmt;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::iter::FromIterator;
 
 pub trait Incr: Clone {
     fn id(&self) -> &str;
@@ -228,6 +230,41 @@ pub struct Code {
     pub value: String,
 }
 
+#[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub struct I18nProperties(pub Vec<Property>);
+
+impl serde::Serialize for I18nProperties {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_map(self.0.iter().map(|p| (&p.key, &p.value)))
+    }
+}
+
+impl<'de> Deserialize<'de> for I18nProperties {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let properties = BTreeMap::<String, String>::deserialize(deserializer)?
+            .into_iter()
+            .collect();
+        Ok(properties)
+    }
+}
+
+impl FromIterator<(String,String)> for I18nProperties {
+    fn from_iter<I: IntoIterator<Item=(String,String)>>(iter: I) -> Self {
+        let properties = iter.into_iter().map(|(k, v)| Property {
+                key: k.to_string(),
+                value: v.to_string(),
+            })
+            .collect::<Vec<_>>();
+        I18nProperties(properties)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FeedPublisher {
     pub id: String,
@@ -321,6 +358,12 @@ pub struct Admin {
 
     #[serde(default)]
     pub codes: Vec<Code>,
+
+    #[serde(default)]
+    pub names: I18nProperties,
+
+    #[serde(default)]
+    pub labels: I18nProperties,
 }
 
 impl Admin {
