@@ -35,6 +35,7 @@ use prometheus;
 use rs_es;
 use rs_es::error::EsError;
 use rs_es::query::Query;
+use rs_es::query::full_text::MultiMatchQuery;
 use rs_es::units as rs_u;
 use serde;
 use serde_json;
@@ -145,6 +146,7 @@ fn build_query(
             .with_boost(boost)
             .build()
     }
+
     let type_query = Query::build_bool()
         .with_should(vec![
             match_type_with_boost::<Addr>(20.),
@@ -156,15 +158,26 @@ fn build_query(
         .with_boost(30.)
         .build();
 
+    fn multi_match(fields: Vec<&str>, query: &str) -> MultiMatchQuery {
+        Query::build_multi_match(
+            fields.into_iter().map(|s| s.into()).collect::<Vec<String>>(),
+            query
+        )
+    }
+
+    let lang = "fr";
+
     // Priorization by query string
     let mut string_should = vec![
-        Query::build_match("name", q).with_boost(1.).build(),
-        Query::build_match("label", q).with_boost(1.).build(),
-        Query::build_match("label.prefix", q).with_boost(1.).build(),
+        multi_match(vec!["name", &format!("names.{}", lang)], q).with_boost(1.).build(),
+        multi_match(vec!["label", &format!("labels.{}",lang)], q).with_boost(1.).build(),
+        multi_match(vec!["label.prefix", &format!("labels.{}.prefix", lang)], q).with_boost(1.).build(),
         Query::build_match("zip_codes", q).with_boost(1.).build(),
     ];
     if let MatchType::Fuzzy = match_type {
-        string_should.push(Query::build_match("label.ngram", q).with_boost(1.).build());
+        string_should.push(
+            multi_match(vec!["label.ngram", &format!("labels.{}.ngram", lang)], q)
+            .with_boost(1.).build());
     }
     let string_query = Query::build_bool()
         .with_should(string_should)

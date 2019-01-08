@@ -323,7 +323,30 @@ impl Rubber {
 
     pub fn create_template(&self, name: &str, settings: &str) -> Result<(), Error> {
         debug!("creating template");
-        self.put(&format!("_template/{}", name), settings)
+
+        // use std::env;
+        // let all_lang_codes = env::var("MIMIR_LANGS")
+        //     .ok()
+        //     .map(|s| {
+        //         s.split(",")
+        //             .map(|s| s.to_owned())
+        //             .collect::<Vec<String>>()
+        //     });
+
+        // let mut all_full_label_fields = vec!["full_label".to_owned()];
+        // if let Some(codes) = all_lang_codes{
+        //     for code in codes.iter() {
+        //         all_full_label_fields.push(
+        //             format!("full_labels.{}", code)
+        //         )
+        //     }
+        // }
+
+        // let settings = settings.replace("{{ALL_FULL_LABELS}}",
+        //     &format!("[\"{}\"]", all_full_label_fields.join("\",\""))
+        // );
+
+        self.put(&format!("_template/{}", name), &settings)
             .map_err(|e| {
                 info!("Error while creating template {}", name);
                 format_err!("Error: {} while creating template {}", e.to_string(), name)
@@ -465,6 +488,9 @@ impl Rubber {
         index: TypedIndex<T>,
     ) -> Result<(), Error> {
         debug!("publishing index");
+
+        // Refresh index before publishing
+        self.es_client.refresh().with_indexes(&[&index.name]).send()?;
         let last_indexes = try!(self.get_last_index(&index, dataset));
 
         let dataset_index = get_main_type_and_dataset_index::<T>(dataset);
@@ -561,6 +587,7 @@ impl Rubber {
                 })
                 .collect::<Vec<_>>()
         });
+
         for chunk in chunks.filter(|c| !c.is_empty()) {
             nb += chunk.len();
             self.es_client

@@ -143,6 +143,12 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
                 .0
                 .iter()
                 .any(|p| p.key == "ru" && p.value == "Метрополия Франции"));
+
+            assert!(fr
+                .labels
+                .0
+                .iter()
+                .any(|p| p.key == "ru" && p.value == "Метрополия Франции"));
         }
         _ => panic!("should be an admin"),
     }

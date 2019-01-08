@@ -77,6 +77,7 @@ impl IntoAdmin for Zone {
             .parent
             .and_then(|id| zones_osm_id.get(&id))
             .map(format_id);
+
         Admin {
             id: format_id(&self.osm_id),
             insee: insee.into(),
@@ -92,7 +93,10 @@ impl IntoAdmin for Zone {
             parent_id: parent_osm_id,
             codes: osm_utils::get_osm_codes_from_tags(&self.tags),
             names: osm_utils::get_names_from_tags(&self.tags),
-            labels: self.international_labels.into_iter().collect()
+            labels: self.international_labels
+                .into_iter()
+                .filter(|(k,_)| vec!["fr","en","ru"].contains(&k.as_str()))
+                .collect()
         }
     }
 }

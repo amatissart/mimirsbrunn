@@ -74,46 +74,12 @@
                 {
                     "i18n_labels": {
                         "match_pattern": "regex",
-                        "path_match": "^labels\\.\\w+",
+                        "path_match": "^label($|s\\.\\w+)",
                         "mapping": {
                             "type": "string",
                             "index_options": "docs",
                             "analyzer": "word",
-                            "copy_to": "full_labels.{name}",
-                            "fields": {
-                                "prefix": {
-                                    "type": "string",
-                                    "index_options": "docs",
-                                    "analyzer": "prefix",
-                                    "search_analyzer": "word",
-                                    "norms": {
-                                        "enabled": false
-                                    }
-                                },
-                                "ngram": {
-                                    "type": "string",
-                                    "index_options": "docs",
-                                    "analyzer": "ngram_with_synonyms",
-                                    "search_analyzer": "ngram",
-                                    "norms": {
-                                        "enabled": false
-                                    }
-                                }
-                            },
-                            "norms": {
-                                "enabled": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "i18n_full_labels": {
-                        "match_pattern": "regex",
-                        "path_match": "^full_label($|s\\.\\w+)",
-                        "mapping": {
-                            "type": "string",
-                            "index_options": "docs",
-                            "analyzer": "word",
+                            "copy_to": "full_label",
                             "fields": {
                                 "prefix": {
                                     "type": "string",
@@ -158,7 +124,7 @@
                     "type": "string",
                     "index_options": "docs",
                     "analyzer": "word",
-                    "copy_to": {{ALL_FULL_LABELS}},
+                    "copy_to": "full_label",
                     "fields": {
                         "prefix": {
                             "type": "string",
@@ -174,11 +140,9 @@
                     "geohash_prefix": true,
                     "geohash_precision": "1m"
                 },
-                "label": {
+                "full_label": {
                     "type": "string",
-                    "index_options": "docs",
-                    "analyzer": "word",
-                    "copy_to": "full_label",
+                    "index": "no",
                     "fields": {
                         "prefix": {
                             "type": "string",
