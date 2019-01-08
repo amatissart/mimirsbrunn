@@ -158,7 +158,7 @@
                     "type": "string",
                     "index_options": "docs",
                     "analyzer": "word",
-                    "copy_to": ["full_label"],
+                    "copy_to": {{ALL_FULL_LABELS}},
                     "fields": {
                         "prefix": {
                             "type": "string",
