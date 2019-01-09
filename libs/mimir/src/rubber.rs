@@ -324,28 +324,6 @@ impl Rubber {
     pub fn create_template(&self, name: &str, settings: &str) -> Result<(), Error> {
         debug!("creating template");
 
-        // use std::env;
-        // let all_lang_codes = env::var("MIMIR_LANGS")
-        //     .ok()
-        //     .map(|s| {
-        //         s.split(",")
-        //             .map(|s| s.to_owned())
-        //             .collect::<Vec<String>>()
-        //     });
-
-        // let mut all_full_label_fields = vec!["full_label".to_owned()];
-        // if let Some(codes) = all_lang_codes{
-        //     for code in codes.iter() {
-        //         all_full_label_fields.push(
-        //             format!("full_labels.{}", code)
-        //         )
-        //     }
-        // }
-
-        // let settings = settings.replace("{{ALL_FULL_LABELS}}",
-        //     &format!("[\"{}\"]", all_full_label_fields.join("\",\""))
-        // );
-
         self.put(&format!("_template/{}", name), &settings)
             .map_err(|e| {
                 info!("Error while creating template {}", name);

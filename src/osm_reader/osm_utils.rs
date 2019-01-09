@@ -83,11 +83,13 @@ pub fn get_osm_codes_from_tags(tags: &osmpbfreader::Tags) -> Vec<mimir::Code> {
 
 pub fn get_names_from_tags(tags: &osmpbfreader::Tags) -> mimir::I18nProperties {
     let langs = vec!["fr","en","ru"];
+
+    let name_tag_prefix = "name:";
     let properties = tags
         .iter()
-        .filter(|(k, _)| k.starts_with("name:"))
+        .filter(|(k, _)| k.starts_with(&name_tag_prefix))
         .map(|property| mimir::Property {
-            key: property.0[5..].to_string(),
+            key: property.0[name_tag_prefix.len()..].to_string(),
             value: property.1.to_string(),
         })
         .filter(|p| langs.contains(&p.key.as_str()))
