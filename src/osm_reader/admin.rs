@@ -174,7 +174,7 @@ pub fn read_administrative_regions(
                 zone_type: zone_type,
                 parent_id: None,
                 codes: get_osm_codes_from_tags(&relation.tags),
-                names: get_names_from_tags(&relation.tags),
+                names: get_names_from_tags(&relation.tags, &vec![]),
                 labels: mimir::I18nProperties::default()
             };
             administrative_regions.push(admin);

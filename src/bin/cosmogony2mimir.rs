@@ -49,7 +49,7 @@ use mimirsbrunn::utils::normalize_admin_weight;
 use std::collections::BTreeMap;
 
 trait IntoAdmin {
-    fn into_admin(self, &BTreeMap<ZoneIndex, String>) -> Admin;
+    fn into_admin(self, &BTreeMap<ZoneIndex, String>, langs: &Vec<String>) -> Admin;
 }
 
 fn get_weight(tags: &osmpbfreader::Tags, center_tags: &osmpbfreader::Tags) -> f64 {
@@ -64,7 +64,7 @@ fn get_weight(tags: &osmpbfreader::Tags, center_tags: &osmpbfreader::Tags) -> f6
 }
 
 impl IntoAdmin for Zone {
-    fn into_admin(self, zones_osm_id: &BTreeMap<ZoneIndex, String>) -> Admin {
+    fn into_admin(self, zones_osm_id: &BTreeMap<ZoneIndex, String>, langs: &Vec<String>) -> Admin {
         let insee = admin::read_insee(&self.tags).unwrap_or("");
         let zip_codes = admin::read_zip_codes(&self.tags);
         let label = self.label;
@@ -92,10 +92,10 @@ impl IntoAdmin for Zone {
             zone_type: self.zone_type,
             parent_id: parent_osm_id,
             codes: osm_utils::get_osm_codes_from_tags(&self.tags),
-            names: osm_utils::get_names_from_tags(&self.tags),
+            names: osm_utils::get_names_from_tags(&self.tags, langs),
             labels: self.international_labels
                 .into_iter()
-                .filter(|(k,_)| vec!["fr","en","ru"].contains(&k.as_str()))
+                .filter(|(k,_)| langs.contains(&k))
                 .collect()
         }
     }
@@ -132,7 +132,7 @@ fn index_cosmogony(args: Args) -> Result<(), Error> {
     let mut admins: Vec<_> = cosmogony
         .zones
         .into_iter()
-        .map(|z| z.into_admin(&cosmogony_id_to_osm_id))
+        .map(|z| z.into_admin(&cosmogony_id_to_osm_id, &args.langs))
         .collect();
 
     normalize_admin_weight(&mut admins);
@@ -172,6 +172,9 @@ struct Args {
     /// Number of replicas for the es index
     #[structopt(short = "r", long = "nb-replicas", default_value = "1")]
     nb_replicas: usize,
+    /// Languages codes, used to build i18n names and labels
+    #[structopt(name = "lang", short, long)]
+    langs: Vec<String>
 }
 
 fn main() {
