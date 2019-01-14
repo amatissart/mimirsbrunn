@@ -39,6 +39,8 @@ pub fn cosmogony2mimir_test(es_wrapper: ::ElasticSearchWrapper) {
     ::launch_and_assert(
         concat!(env!("OUT_DIR"), "/../../../cosmogony2mimir"),
         vec![
+            "--lang=fr".into(),
+            "--lang=ru".into(),
             "--input=./tests/fixtures/cosmogony.json".into(),
             format!("--connection-string={}", es_wrapper.host()),
         ],

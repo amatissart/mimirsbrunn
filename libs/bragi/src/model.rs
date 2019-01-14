@@ -166,8 +166,13 @@ impl From<mimir::Place> for Feature {
 
 impl From<mimir::Admin> for GeocodingResponse {
     fn from(other: mimir::Admin) -> GeocodingResponse {
+        let name = other.names.get("fr")
+            .unwrap_or(&other.name);
+        let label = other.labels.get("fr")
+            .unwrap_or(&other.label);
+
         let type_ = get_admin_type(&other);
-        let name = Some(other.name);
+        let name = Some(name.to_owned());
         let insee = Some(other.insee);
         let level = Some(other.level); //might be used for type_ and become useless
         let postcode = if other.zip_codes.is_empty() {
@@ -175,7 +180,7 @@ impl From<mimir::Admin> for GeocodingResponse {
         } else {
             Some(other.zip_codes.join(";"))
         };
-        let label = Some(other.label);
+        let label = Some(label.to_owned());
         GeocodingResponse {
             id: other.id,
             citycode: insee,

@@ -265,6 +265,14 @@ impl FromIterator<(String,String)> for I18nProperties {
     }
 }
 
+impl I18nProperties {
+    pub fn get(&self, lang: &str) -> Option<&str> {
+        self.0.iter()
+            .find(|p| p.key == lang)
+            .map(|p| p.value.as_ref())
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FeedPublisher {
     pub id: String,
