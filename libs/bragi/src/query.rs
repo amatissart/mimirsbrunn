@@ -37,6 +37,7 @@ use rs_es::error::EsError;
 use rs_es::query::Query;
 use rs_es::query::full_text::MultiMatchQuery;
 use rs_es::units as rs_u;
+use rs_es::query::compound::BoostMode;
 use serde;
 use serde_json;
 use std::fmt;
@@ -169,9 +170,9 @@ fn build_query(
 
     // Priorization by query string
     let mut string_should = vec![
-        multi_match(vec!["name", &format!("names.{}", lang)], q).with_boost(1.).build(),
-        multi_match(vec!["label", &format!("labels.{}",lang)], q).with_boost(1.).build(),
-        multi_match(vec!["label.prefix", &format!("labels.{}.prefix", lang)], q).with_boost(1.).build(),
+        multi_match(vec!["name", &format!("names.{}", lang)], q).with_boost(1.8).build(),
+        multi_match(vec!["label", &format!("labels.{}",lang)], q).with_boost(0.6).build(),
+        multi_match(vec!["label.prefix", &format!("labels.{}.prefix", lang)], q).with_boost(0.6).build(),
         Query::build_match("zip_codes", q).with_boost(1.).build(),
     ];
     if let MatchType::Fuzzy = match_type {
@@ -188,8 +189,13 @@ fn build_query(
     let importance_query = match coord {
         &Some(ref c) => build_proximity_with_boost(c, 100.),
         &None => Query::build_function_score()
-            .with_function(Function::build_field_value_factor("weight").build())
-            .with_boost(30.)
+            .with_function(
+                Function::build_field_value_factor("weight")
+                .with_factor(0.1)
+                .with_missing(0.)
+                .build()
+            )
+            .with_boost_mode(BoostMode::Replace)
             .build(),
     };
 
