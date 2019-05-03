@@ -37,6 +37,7 @@ use rs_es;
 use rs_es::error::EsError;
 use rs_es::operations::search::Source;
 use rs_es::query::compound::BoostMode;
+use rs_es::query::functions::Modifier;
 use rs_es::query::Query;
 use rs_es::units as rs_u;
 use serde;
@@ -165,13 +166,20 @@ fn build_query<'a>(
     let format_labels_field = |lang| format!("labels.{}", lang);
     let format_labels_prefix_field = |lang| format!("labels.{}.prefix", lang);
 
-    const I18N_FIELD_BOOST: f64 = 1.2;
+    const I18N_FIELD_BOOST: f64 = 1.05;
     let build_multi_match =
-        |default_field: &str, lang_field_formatter: &dyn Fn(&'a &'a str) -> String| {
+        |default_field: &str, lang_field_formatter: &dyn Fn(&'a &'a str) -> String, with_boost: bool| {
             let boosted_i18n_fields = langs
                 .iter()
                 .map(lang_field_formatter)
-                .map(|f| format!("{}^{:.2}", f, I18N_FIELD_BOOST));
+                .map(|f| {
+                    if with_boost {
+                        format!("{}^{:.2}", f, I18N_FIELD_BOOST)
+                    }
+                    else{
+                        f
+                    }
+                });
             let fields: Vec<String> = iter::once(default_field.into())
                 .chain(boosted_i18n_fields)
                 .collect();
@@ -180,13 +188,13 @@ fn build_query<'a>(
 
     // Priorization by query string
     let mut string_should = vec![
-        build_multi_match("name", &format_names_field)
+        build_multi_match("name", &format_names_field, true)
             .with_boost(1.8)
             .build(),
-        build_multi_match("label", &format_labels_field)
+        build_multi_match("label", &format_labels_field, false)
             .with_boost(0.6)
             .build(),
-        build_multi_match("label.prefix", &format_labels_prefix_field)
+        build_multi_match("label.prefix", &format_labels_prefix_field, false)
             .with_boost(0.6)
             .build(),
         Query::build_match("zip_codes", q).with_boost(1.).build(),
@@ -194,7 +202,7 @@ fn build_query<'a>(
     if let MatchType::Fuzzy = match_type {
         let format_labels_ngram_field = |lang| format!("labels.{}.ngram", lang);
         string_should.push(
-            build_multi_match("label.ngram", &format_labels_ngram_field)
+            build_multi_match("label.ngram", &format_labels_ngram_field, false)
                 .with_boost(1.)
                 .build(),
         );
@@ -210,13 +218,29 @@ fn build_query<'a>(
         None => Query::build_function_score()
             .with_function(
                 Function::build_field_value_factor("weight")
-                    .with_factor(0.1)
+                    .with_factor(0.15)
                     .with_missing(0.)
                     .build(),
             )
             .with_boost_mode(BoostMode::Replace)
             .build(),
     };
+
+    let admin_importance_query = Query::build_function_score()
+        .with_query(
+            Query::build_terms("_type")
+                .with_values(vec![Admin::doc_type()]).build()
+        )
+        .with_functions(vec![
+            Function::build_field_value_factor("weight")
+                .with_factor(1e6)
+                .with_modifier(Modifier::Log1p)
+                .with_missing(0.)
+                .build(),
+            Function::build_weight(0.03).build(),
+        ])
+        .with_boost_mode(BoostMode::Replace)
+        .build();
 
     // filter to handle house number
     // we either want:
@@ -272,7 +296,8 @@ fn build_query<'a>(
     }
 
     let mut query = Query::build_bool()
-        .with_must(vec![type_query, string_query, importance_query])
+        .with_must(vec![type_query, string_query])
+        .with_should(vec![importance_query, admin_importance_query])
         .with_filter(Query::build_bool().with_must(filters).build());
 
     if !zone_types.is_empty() {
