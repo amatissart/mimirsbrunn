@@ -148,7 +148,7 @@ fn build_with_weight<A: Into<Option<f64>>>(factor: A) -> Query {
         FilteredFunction::build_filtered_function(
             Query::build_term("_type", doc_type).build(),
             Function::build_field_value_factor("weight")
-                .with_factor(factor.unwrap_or(0.75))
+                .with_factor(factor.unwrap_or(0.3))
                 .with_missing(0.0)
                 .build(),
             Function::build_weight(weight),
