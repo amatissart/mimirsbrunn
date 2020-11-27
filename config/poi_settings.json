@@ -168,6 +168,7 @@
                 "address": {
                     "properties": {
                         "label": {
+                            "index": "no",
                             "type": "string",
                             "copy_to": "full_label"
                         }
