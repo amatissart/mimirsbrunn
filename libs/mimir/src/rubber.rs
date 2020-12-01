@@ -814,7 +814,7 @@ impl Rubber {
             .es_client
             .search_query()
             .with_indexes(&[&index])
-            .with_size(1000)
+            .with_size(100)
             .with_types(&[&T::doc_type()])
             .scan(&Duration::minutes(1))?;
         loop {
